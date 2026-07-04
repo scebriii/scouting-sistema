@@ -212,8 +212,8 @@ def render_pizarra_tactica(rivales, nombres):
     if rival_tactico:
         rival_id = nombres[rival_tactico]
         rival_info = db.obtener_rival(rival_id)
-        sistema = rival_info.get("sistema_tactico", "4-3-3") if rival_info else "4-3-3"
-        estilo = rival_info.get("estilo_juego", "") if rival_info else ""
+        sistema = str(rival_info.get("sistema_tactico", "4-3-3")) if rival_info else "4-3-3"
+        estilo = str(rival_info.get("estilo_juego", "")) if rival_info else ""
 
         # Info del rival en cabecera
         col_a, col_b, col_c = st.columns([1, 2, 1])
