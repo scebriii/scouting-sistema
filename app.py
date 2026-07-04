@@ -3,6 +3,7 @@ import streamlit as st
 
 import database as db
 import utils
+import tactical_server
 
 # Configuración global de la página
 st.set_page_config(
@@ -194,6 +195,84 @@ def render_ingesta(rivales, nombres):
                 st.success("Evento de scouting guardado con éxito.")
                 st.rerun() # Actualiza el dashboard inmediatamente
 
+def render_pizarra_tactica(rivales, nombres):
+    """Renderiza la Pizarra Táctica con el simulador React integrado."""
+    if not rivales:
+        st.info("Registra un rival en 'Ingesta de Datos' para usar la Pizarra Táctica con datos del rival.")
+
+    # Selector de rival para cargar información táctica
+    rival_tactico = st.selectbox(
+        "Seleccionar rival para cargar sistema táctico",
+        [""] + list(nombres.keys()),
+        key="tactico_rival",
+    )
+
+    # Obtener info del rival seleccionado
+    rival_info = None
+    if rival_tactico:
+        rival_id = nombres[rival_tactico]
+        rival_info = db.obtener_rival(rival_id)
+        sistema = rival_info.get("sistema_tactico", "4-3-3") if rival_info else "4-3-3"
+        estilo = rival_info.get("estilo_juego", "") if rival_info else ""
+
+        # Info del rival en cabecera
+        col_a, col_b, col_c = st.columns([1, 2, 1])
+        with col_b:
+            st.markdown(f"### 🏟️ Analizando a: **{rival_tactico}**")
+            st.caption(f"Sistema: {sistema} | Estilo: {estilo or 'No definido'}")
+
+    # Título de la pizarra
+    st.markdown("### ⚽ Pizarra Táctica Interactiva — TacticalOS")
+    st.caption("Arrastra jugadores para diseñar jugadas. Usa los conos de visión, líneas de pase y analítica CAFYD.")
+
+    # Obtener URL del servidor de estáticos
+    tactical_url = tactical_server.get_tactical_url()
+
+    # Inyectar datos del rival como variable global antes del iframe
+    import json
+    rival_init = json.dumps({
+        "rival": rival_tactico,
+        "sistema": sistema if rival_tactico else "4-3-3",
+        "estilo": estilo,
+    })
+
+    # Wrapper HTML: inyecta datos + iframe al simulador
+    wrapper_html = f"""
+    <script>
+        window.__TACTICAL_RIVAL_DATA = {rival_init};
+    </script>
+    <iframe
+        src="{tactical_url}/index.html"
+        width="100%"
+        height="900"
+        frameborder="0"
+        style="border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);"
+        allowfullscreen
+    ></iframe>
+    """
+
+    st.components.v1.html(
+        wrapper_html,
+        height=950,
+        scrolling=True,
+    )
+
+    # Info adicional debajo
+    st.divider()
+    with st.expander("💡 Guía rápida de la Pizarra Táctica"):
+        st.markdown("""
+**TacticalOS** es un simulador táctico avanzado para planificación de partidos:
+
+- **🖱️ Arrastrar jugadores**: Coloca jugadores en posiciones específicas
+- **Conos de visión**: Visualiza el campo de visión de cada jugador
+- **Líneas de pase**: Identifica opciones de pase disponibles
+- **Análisis CAFYD**: Métricas de control territorial, compactidad y orientación
+- **Situaciones prefijadas**: Saques de banda, córners, libres, contragolpes
+- **Exportar/Importar**: Guarda y carga configuraciones JSON
+- **Dibujo libre**: Dibuja rutas, flechas y anotaciones sobre el campo
+        """)
+
+
 def render_plan_partido(rivales, nombres):
     """Renderiza la pestaña de la Matriz de Interacción y Plan de Partido."""
     if not rivales:
@@ -310,10 +389,11 @@ def main():
         
     nombres = {r["nombre"]: r["id"] for r in rivales}
 
-    tab_dash, tab_ingesta, tab_plan = st.tabs([
+    tab_dash, tab_ingesta, tab_plan, tab_tactico = st.tabs([
         "📊 Panel de Control", 
         "📝 Ingesta de Datos", 
-        "🧩 Matriz Sistémica y Microciclo"
+        "🧩 Matriz Sistémica y Microciclo",
+        "⚽ Pizarra Táctica"
     ])
 
     with tab_dash:
@@ -324,6 +404,9 @@ def main():
         
     with tab_plan:
         render_plan_partido(rivales, nombres)
+        
+    with tab_tactico:
+        render_pizarra_tactica(rivales, nombres)
 
 if __name__ == "__main__":
     main()
