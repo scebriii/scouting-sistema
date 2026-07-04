@@ -11,6 +11,69 @@ st.set_page_config(
     layout="wide",
 )
 
+
+def inyectar_css_premium():
+    """Inyecta CSS personalizado para aplicar un diseño de Glassmorphism."""
+    st.markdown(
+        """
+    <style>
+        /* 1. Ocultar el branding por defecto de Streamlit para un look limpio */
+        #MainMenu {visibility: hidden;}
+        footer {visibility: hidden;}
+        header {visibility: hidden;}
+
+        /* 2. Fondo global inmersivo (Dark Theme deportivo) */
+        .stApp {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #f8fafc;
+        }
+
+        /* 3. Efecto Glassmorphism en métricas, formularios y contenedores */
+        [data-testid="stForm"], [data-testid="stMetric"] {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 20px !important;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        /* 4. Micro-interacciones (Hover) al pasar el ratón */
+        [data-testid="stForm"]:hover, [data-testid="stMetric"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        /* 5. Estilización de las Pestañas (Tabs) */
+        .stTabs [data-baseweb="tab-list"] {
+            gap: 10px;
+            background-color: transparent;
+        }
+
+        .stTabs [data-baseweb="tab"] {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px 8px 0 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: none;
+            padding: 10px 20px;
+            color: #94a3b8;
+        }
+
+        /* Pestaña activa */
+        .stTabs [aria-selected="true"] {
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            border-bottom: 2px solid #3b82f6; /* Acento azul tecnológico */
+        }
+    </style>
+    """,
+        unsafe_allow_html=True,
+    )
+
+
 def inicializar_datos():
     """Inicializa la base de datos y carga los datos de prueba si está vacía."""
     db.init_db()
@@ -232,7 +295,13 @@ def render_plan_partido(rivales, nombres):
 
 def main():
     """Función principal de orquestación de la aplicación."""
+    # 1. Ejecutar la inyección de CSS antes de renderizar nada
+    inyectar_css_premium()
+    
+    # 2. Inicializar los datos
     inicializar_datos()
+    
+    # El resto de tu código se mantiene intacto
     st.title("🎯 Sistema Inteligente de Scouting y Planificación")
 
     rivales = db.obtener_rivales()
