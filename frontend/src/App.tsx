@@ -1,59 +1,34 @@
 import React, { useState } from 'react';
-import { 
-  Play, Pause, FastForward, Save, 
-  Settings, Bell, TrendingUp, Zap
-} from 'lucide-react';
 
 interface Player {
   id: number;
   name: string;
-  position: string;
   x: number;
   y: number;
   team: 'def' | 'att';
 }
 
-interface MatchData {
-  rival: string;
-  sistema: string;
-  estilo: string;
-}
-
 const TacticalOS: React.FC = () => {
-  const [matchData, setMatchData] = useState<MatchData>({
-    rival: 'Real Madrid',
-    sistema: '4-3-3',
-    estilo: 'Posesión alta'
-  });
-  
   const [isPlaying, setIsPlaying] = useState(false);
-  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+  const [defensiveBlock, setDefensiveBlock] = useState<'low' | 'mid' | 'high'>('mid');
+  const [horizontalShift, setHorizontalShift] = useState(68);
+  const [verticalCompactness, setVerticalCompactness] = useState(42);
   const [showVoronoi, setShowVoronoi] = useState(true);
   const [showVisionCones, setShowVisionCones] = useState(false);
   const [showHeatmap, setShowHeatmap] = useState(false);
   const [showSpaceAnalysis, setShowSpaceAnalysis] = useState(false);
-  const [defensiveBlock, setDefensiveBlock] = useState<'low' | 'mid' | 'high'>('mid');
-  const [horizontalShift, setHorizontalShift] = useState(68);
-  const [verticalCompactness, setVerticalCompactness] = useState(42);
   const [timelineProgress, setTimelineProgress] = useState(45);
   const [currentTime, setCurrentTime] = useState('00:14');
-  const [totalTime, setTotalTime] = useState('00:30');
 
   const players: Player[] = [
-    // Defensivos
-    { id: 1, name: '4', position: 'LD', x: 20, y: 30, team: 'def' },
-    { id: 2, name: '3', position: 'LI', x: 20, y: 70, team: 'def' },
-    { id: 3, name: '5', position: 'CD', x: 30, y: 50, team: 'def' },
-    { id: 4, name: '8', position: 'MC', x: 45, y: 40, team: 'def' },
-    // Atacantes
-    { id: 5, name: '9', position: 'DC', x: 50, y: 70, team: 'att' },
-    { id: 6, name: '10', position: 'MCO', x: 65, y: 55, team: 'att' },
-    { id: 7, name: '7', position: 'EI', x: 70, y: 30, team: 'att' },
+    { id: 1, name: '4', x: 20, y: 30, team: 'def' },
+    { id: 2, name: '3', x: 20, y: 70, team: 'def' },
+    { id: 3, name: '5', x: 30, y: 50, team: 'def' },
+    { id: 4, name: '8', x: 45, y: 40, team: 'def' },
+    { id: 5, name: '9', x: 50, y: 70, team: 'att' },
+    { id: 6, name: '10', x: 65, y: 55, team: 'att' },
+    { id: 7, name: '7', x: 70, y: 30, team: 'att' },
   ];
-
-  const handlePlayerClick = (player: Player) => {
-    setSelectedPlayer(player);
-  };
 
   const handleTimelineClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -63,375 +38,353 @@ const TacticalOS: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-tactical-dark text-white">
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-tactical-glass backdrop-blur-xl border-b border-white/10">
-        <div className="flex items-center justify-between px-6 py-4">
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
-              <Zap className="w-7 h-7 text-tactical-primary" />
-              <h1 className="text-2xl font-bold text-tactical-primary">TacticalOS</h1>
-            </div>
-            <div className="flex items-center space-x-2 px-3 py-1 bg-tactical-tertiary/10 rounded-full border border-tactical-tertiary/20">
-              <div className="w-2 h-2 rounded-full bg-tactical-tertiary animate-pulse-slow"></div>
-              <span className="text-sm font-medium text-tactical-tertiary">LIVE TELEMETRY v2.4</span>
-            </div>
-          </div>
-          
-          <nav className="hidden md:flex items-center space-x-8">
-            <a href="#" className="text-gray-400 hover:text-white transition-colors">Analysis</a>
-            <a href="#" className="text-tactical-primary font-semibold border-b-2 border-tactical-primary pb-1">Simulator</a>
-            <a href="#" className="text-gray-400 hover:text-white transition-colors">Scouting</a>
-            <a href="#" className="text-gray-400 hover:text-white transition-colors">Library</a>
-          </nav>
-          
-          <div className="flex items-center space-x-4">
-            <button className="p-2 text-gray-400 hover:text-white transition-colors">
-              <Bell className="w-5 h-5" />
-            </button>
-            <button className="p-2 text-gray-400 hover:text-white transition-colors">
-              <Settings className="w-5 h-5" />
-            </button>
-            <div className="w-8 h-8 rounded-full bg-gray-700 border border-white/20 flex items-center justify-center">
-              <span className="text-sm">U</span>
+    <div className="flex flex-col h-screen antialiased text-[var(--color-text-primary)] selection:bg-[var(--color-primary-container)] selection:text-[var(--color-on-primary-container)]">
+      {/* ===== TopNavBar ===== */}
+      <header className="fixed top-0 w-full z-50 flex justify-between items-center px-[24px] h-16 bg-[#111827b8] backdrop-blur-xl border-b border-[#ffffff14]">
+        <div className="flex items-center gap-[8px]">
+          <span
+            className="material-symbols-outlined text-[var(--color-primary)] text-[28px]"
+            style={{ fontVariationSettings: "'FILL' 1" }}
+          >
+            speed
+          </span>
+          <span className="font-headline-lg font-bold text-[var(--color-primary)] tracking-tight">TacticalOS</span>
+          <span className="ml-4 font-stats-md text-[var(--color-tertiary)] flex items-center gap-2 px-3 py-1 bg-[var(--color-tertiary-container)]/10 rounded-full border border-[var(--color-tertiary)]/20">
+            <span className="w-2 h-2 rounded-full bg-[var(--color-tertiary)] animate-pulse"></span>
+            LIVE TELEMETRY v2.4
+          </span>
+        </div>
+        <nav className="hidden md:flex gap-[16px] h-full items-center">
+          <a href="#" className="font-body-md h-full flex items-center px-2 text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-colors duration-200">Analysis</a>
+          <a href="#" className="font-body-md h-full flex items-center px-2 text-[var(--color-primary)] font-bold border-b-2 border-[var(--color-primary)] pb-[2px] transition-colors duration-200">Simulator</a>
+          <a href="#" className="font-body-md h-full flex items-center px-2 text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-colors duration-200">Scouting</a>
+          <a href="#" className="font-body-md h-full flex items-center px-2 text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-colors duration-200">Library</a>
+        </nav>
+        <div className="flex items-center gap-[16px]">
+          <button className="text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-colors spring-physics hover:scale-110">
+            <span className="material-symbols-outlined">notifications</span>
+          </button>
+          <button className="text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-colors spring-physics hover:scale-110">
+            <span className="material-symbols-outlined">settings</span>
+          </button>
+          <div className="w-8 h-8 rounded-full bg-[var(--color-surface-variant)] border border-[#ffffff14] overflow-hidden ml-[8px] cursor-pointer">
+            <div className="w-full h-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-inverse-primary)] flex items-center justify-center">
+              <span className="text-xs font-bold text-[var(--color-on-primary)]">SC</span>
             </div>
           </div>
         </div>
       </header>
 
-      <div className="flex pt-20">
-        {/* Sidebar */}
-        <aside className="fixed left-0 top-20 bottom-0 w-64 bg-tactical-glass backdrop-blur-2xl border-r border-white/10 overflow-y-auto">
-          <div className="p-6 border-b border-white/10">
-            <h3 className="text-lg font-semibold text-tactical-primary mb-1">Sim Engine</h3>
-            <p className="text-sm text-gray-400">Defensive Phase Analysis</p>
+      <div className="flex flex-1 pt-16 overflow-hidden">
+        {/* ===== SideNavBar ===== */}
+        <aside className="hidden md:flex flex-col fixed left-0 top-16 bottom-0 z-40 w-64 bg-[#111827b8] backdrop-blur-2xl border-r border-[#ffffff14] shadow-lg shadow-[#3b82f666]/10 overflow-y-auto">
+          <div className="p-[24px] border-b border-[#ffffff14]">
+            <h3 className="font-headline-md text-[var(--color-primary)] mb-1">Sim Engine</h3>
+            <p className="font-stats-md text-[var(--color-text-secondary)]">Defensive Phase Analysis</p>
           </div>
-          
-          <div className="p-6 space-y-6">
-            <div>
-              <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3">Defensive AI Block</h4>
-              <div className="flex bg-tactical-surface rounded-lg p-1 border border-white/10">
-                <button 
-                  onClick={() => setDefensiveBlock('low')}
-                  className={`flex-1 py-1 px-2 text-xs font-medium rounded-md transition-colors ${
-                    defensiveBlock === 'low' ? 'bg-tactical-primary/20 text-tactical-primary border border-tactical-primary/30' : 'text-gray-400 hover:text-white'
-                  }`}
-                >
-                  Low
-                </button>
-                <button 
-                  onClick={() => setDefensiveBlock('mid')}
-                  className={`flex-1 py-1 px-2 text-xs font-medium rounded-md transition-colors ${
-                    defensiveBlock === 'mid' ? 'bg-tactical-primary/20 text-tactical-primary border border-tactical-primary/30' : 'text-gray-400 hover:text-white'
-                  }`}
-                >
-                  Mid
-                </button>
-                <button 
-                  onClick={() => setDefensiveBlock('high')}
-                  className={`flex-1 py-1 px-2 text-xs font-medium rounded-md transition-colors ${
-                    defensiveBlock === 'high' ? 'bg-tactical-primary/20 text-tactical-primary border border-tactical-primary/30' : 'text-gray-400 hover:text-white'
-                  }`}
-                >
-                  High
-                </button>
+          <div className="p-[24px] flex flex-col gap-[24px]">
+            {/* Defensive AI Block */}
+            <div className="flex flex-col gap-[16px]">
+              <h4 className="font-label-sm text-[var(--color-text-muted)] uppercase tracking-widest">Defensive AI Block</h4>
+              <div className="flex bg-[var(--color-surface-container)] rounded-lg p-1 border border-[#ffffff14]">
+                {(['low', 'mid', 'high'] as const).map((block) => (
+                  <button
+                    key={block}
+                    onClick={() => setDefensiveBlock(block)}
+                    className={`flex-1 py-1 px-2 font-label-sm rounded-md transition-colors ${
+                      defensiveBlock === block
+                        ? 'bg-[var(--color-primary-container)]/20 text-[var(--color-primary)] border border-[var(--color-primary)]/30 glow-active'
+                        : 'text-[var(--color-text-secondary)] hover:text-[var(--color-primary)]'
+                    }`}
+                  >
+                    {block.charAt(0).toUpperCase() + block.slice(1)}
+                  </button>
+                ))}
+              </div>
+              <div className="flex flex-col gap-2 mt-2">
+                <div className="flex justify-between items-center">
+                  <span className="font-label-sm text-[var(--color-text-secondary)]">Horizontal Shift</span>
+                  <span className="font-stats-md text-[var(--color-primary)]">{horizontalShift}%</span>
+                </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="100"
+                  value={horizontalShift}
+                  onChange={(e) => setHorizontalShift(Number(e.target.value))}
+                  className="w-full"
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <div className="flex justify-between items-center">
+                  <span className="font-label-sm text-[var(--color-text-secondary)]">Vertical Compactness</span>
+                  <span className="font-stats-md text-[var(--color-primary)]">{verticalCompactness}m</span>
+                </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="100"
+                  value={verticalCompactness}
+                  onChange={(e) => setVerticalCompactness(Number(e.target.value))}
+                  className="w-full"
+                />
               </div>
             </div>
-            
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-400">Horizontal Shift</span>
-                <span className="text-sm font-medium text-tactical-primary">{horizontalShift}%</span>
-              </div>
-              <input
-                type="range"
-                min="1"
-                max="100"
-                value={horizontalShift}
-                onChange={(e) => setHorizontalShift(Number(e.target.value))}
-                className="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer"
-              />
-            </div>
-            
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-400">Vertical Compactness</span>
-                <span className="text-sm font-medium text-tactical-primary">{verticalCompactness}m</span>
-              </div>
-              <input
-                type="range"
-                min="1"
-                max="100"
-                value={verticalCompactness}
-                onChange={(e) => setVerticalCompactness(Number(e.target.value))}
-                className="w-full h-1 bg-gray-700 rounded-lg appearance-none cursor-pointer"
-              />
-            </div>
-            
-            <div className="space-y-3 pt-4 border-t border-white/10">
-              <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wider">Visual Overlays</h4>
-              
-              <label className="flex items-center justify-between cursor-pointer">
-                <span className="text-sm text-gray-400">Voronoi Tessellation</span>
-                <input
-                  type="checkbox"
-                  checked={showVoronoi}
-                  onChange={() => setShowVoronoi(!showVoronoi)}
-                  className="sr-only"
-                />
-                <div className={`w-10 h-6 rounded-full transition-colors ${showVoronoi ? 'bg-tactical-primary' : 'bg-gray-700'}`}>
-                  <div className={`w-4 h-4 rounded-full bg-white transition-transform mt-1 ${showVoronoi ? 'translate-x-5' : 'translate-x-1'}`}></div>
-                </div>
-              </label>
-              
-              <label className="flex items-center justify-between cursor-pointer">
-                <span className="text-sm text-gray-400">Vision Cones</span>
-                <input
-                  type="checkbox"
-                  checked={showVisionCones}
-                  onChange={() => setShowVisionCones(!showVisionCones)}
-                  className="sr-only"
-                />
-                <div className={`w-10 h-6 rounded-full transition-colors ${showVisionCones ? 'bg-tactical-primary' : 'bg-gray-700'}`}>
-                  <div className={`w-4 h-4 rounded-full bg-white transition-transform mt-1 ${showVisionCones ? 'translate-x-5' : 'translate-x-1'}`}></div>
-                </div>
-              </label>
-              
-              <label className="flex items-center justify-between cursor-pointer">
-                <span className="text-sm text-gray-400">Pressure Heatmap</span>
-                <input
-                  type="checkbox"
-                  checked={showHeatmap}
-                  onChange={() => setShowHeatmap(!showHeatmap)}
-                  className="sr-only"
-                />
-                <div className={`w-10 h-6 rounded-full transition-colors ${showHeatmap ? 'bg-tactical-primary' : 'bg-gray-700'}`}>
-                  <div className={`w-4 h-4 rounded-full bg-white transition-transform mt-1 ${showHeatmap ? 'translate-x-5' : 'translate-x-1'}`}></div>
-                </div>
-              </label>
-              
-              <label className="flex items-center justify-between cursor-pointer">
-                <span className="text-sm text-gray-400">Análisis de Espacios</span>
-                <input
-                  type="checkbox"
-                  checked={showSpaceAnalysis}
-                  onChange={() => setShowSpaceAnalysis(!showSpaceAnalysis)}
-                  className="sr-only"
-                />
-                <div className={`w-10 h-6 rounded-full transition-colors ${showSpaceAnalysis ? 'bg-tactical-primary' : 'bg-gray-700'}`}>
-                  <div className={`w-4 h-4 rounded-full bg-white transition-transform mt-1 ${showSpaceAnalysis ? 'translate-x-5' : 'translate-x-1'}`}></div>
-                </div>
-              </label>
+
+            {/* Visual Overlays */}
+            <div className="flex flex-col gap-[16px] mt-4 border-t border-[#ffffff14] pt-[24px]">
+              <h4 className="font-label-sm text-[var(--color-text-muted)] uppercase tracking-widest">Visual Overlays</h4>
+
+              {[
+                { label: 'Voronoi Tessellation', state: showVoronoi, setter: setShowVoronoi },
+                { label: 'Vision Cones', state: showVisionCones, setter: setShowVisionCones },
+                { label: 'Pressure Heatmap', state: showHeatmap, setter: setShowHeatmap },
+                { label: 'Análisis de Espacios', state: showSpaceAnalysis, setter: setShowSpaceAnalysis },
+              ].map(({ label, state, setter }) => (
+                <label key={label} className="flex items-center justify-between cursor-pointer group">
+                  <span className="font-body-md text-[var(--color-text-secondary)] group-hover:text-[var(--color-text-primary)] transition-colors">{label}</span>
+                  <div className="relative">
+                    <input
+                      type="checkbox"
+                      checked={state}
+                      onChange={() => setter(!state)}
+                      className="sr-only"
+                    />
+                    <div className="block bg-[var(--color-surface-container)] w-10 h-6 rounded-full border border-[#ffffff14]"></div>
+                    <div
+                      className={`dot absolute left-1 top-1 w-4 h-4 rounded-full transition transform ${
+                        state
+                          ? 'bg-[var(--color-primary)] translate-x-4 shadow-[0_0_8px_rgba(77,142,255,0.6)]'
+                          : 'bg-[var(--color-surface-variant)]'
+                      }`}
+                    ></div>
+                  </div>
+                </label>
+              ))}
             </div>
           </div>
-          
-          <div className="p-6 mt-auto">
-            <button className="w-full flex items-center justify-center space-x-2 py-2 px-4 rounded-lg bg-gradient-to-r from-tactical-primary to-blue-600 text-white font-medium text-sm border border-tactical-primary/50 hover:scale-[0.98] transition-transform glow-primary">
-              <Zap className="w-4 h-4" />
-              <span>Launch Simulation</span>
+          <div className="mt-auto p-[24px]">
+            <button className="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg bg-gradient-to-r from-[var(--color-primary-container)] to-[var(--color-inverse-primary)] text-[var(--color-text-primary)] font-label-sm border border-[var(--color-primary)]/50 spring-physics hover:scale-[0.98] glow-active">
+              <span className="material-symbols-outlined text-[18px]">rocket_launch</span>
+              Launch Simulation
             </button>
           </div>
         </aside>
 
-        {/* Main Content */}
-        <main className="flex-1 ml-64 relative">
-          {/* Match Info */}
-          <div className="absolute top-6 right-6 z-20 w-64 space-y-4">
-            <div className="glass-panel p-4">
-              <h5 className="text-xs font-medium text-gray-500 uppercase mb-2">Line Distance</h5>
-              <div className="flex items-end space-x-2">
-                <span className="text-2xl font-bold text-white">18.4</span>
-                <span className="text-sm text-gray-400 mb-1">m</span>
+        {/* ===== Central Area: Tactical Pitch ===== */}
+        <main className="flex-1 ml-0 md:ml-64 relative bg-[var(--color-canvas)] pitch-grid flex items-center justify-center mb-20 md:mb-24">
+          {/* Floating HUD (Right) */}
+          <div className="absolute right-[24px] top-[24px] flex flex-col gap-[16px] z-20 w-64 pointer-events-none">
+            {/* KPI Card 1: Line Distance */}
+            <div className="glass-panel p-4 pointer-events-auto spring-physics hover:border-[var(--color-primary)]/30">
+              <h5 className="font-label-sm text-[var(--color-text-muted)] uppercase mb-1">Line Distance</h5>
+              <div className="flex items-end gap-2">
+                <span className="font-headline-lg text-[var(--color-text-primary)] leading-none">18.4</span>
+                <span className="font-stats-md text-[var(--color-text-secondary)] mb-1">m</span>
               </div>
-              <div className="mt-2 h-1 w-full bg-gray-700 rounded-full overflow-hidden">
-                <div className="h-full bg-tactical-tertiary w-3/4 rounded-full glow-tertiary"></div>
-              </div>
-            </div>
-            
-            <div className="glass-panel p-4">
-              <h5 className="text-xs font-medium text-gray-500 uppercase mb-2">Defensive xG</h5>
-              <div className="flex items-end space-x-2">
-                <span className="text-2xl font-bold text-white">0.12</span>
-              </div>
-              <div className="mt-2 flex space-x-1">
-                <div className="h-1 flex-1 bg-tactical-tertiary rounded-full glow-tertiary"></div>
-                <div className="h-1 flex-1 bg-gray-700 rounded-full"></div>
-                <div className="h-1 flex-1 bg-gray-700 rounded-full"></div>
+              <div className="mt-2 h-1 w-full bg-[var(--color-surface-container)] rounded-full overflow-hidden">
+                <div className="h-full bg-[var(--color-tertiary)] w-3/4 rounded-full shadow-[0_0_8px_rgba(78,222,163,0.6)]"></div>
               </div>
             </div>
-            
-            <div className="glass-panel p-4">
-              <h5 className="text-xs font-medium text-gray-500 uppercase mb-3">Ocupación de Espacios</h5>
+
+            {/* KPI Card 2: Defensive xG */}
+            <div className="glass-panel p-4 pointer-events-auto spring-physics hover:border-[var(--color-primary)]/30">
+              <h5 className="font-label-sm text-[var(--color-text-muted)] uppercase mb-1">Defensive xG</h5>
+              <div className="flex items-end gap-2">
+                <span className="font-headline-lg text-[var(--color-text-primary)] leading-none">0.12</span>
+              </div>
+              <div className="mt-2 flex gap-1">
+                <div className="h-1 flex-1 bg-[var(--color-tertiary)] rounded-full shadow-[0_0_8px_rgba(78,222,163,0.6)]"></div>
+                <div className="h-1 flex-1 bg-[var(--color-surface-container)] rounded-full"></div>
+                <div className="h-1 flex-1 bg-[var(--color-surface-container)] rounded-full"></div>
+              </div>
+            </div>
+
+            {/* KPI Card 3: Ocupación de Espacios */}
+            <div className="glass-panel p-4 pointer-events-auto spring-physics hover:border-[var(--color-primary)]/30">
+              <h5 className="font-label-sm text-[var(--color-text-muted)] uppercase mb-2">Ocupación de Espacios</h5>
               <div className="flex items-center justify-between mb-3">
-                <span className="text-lg font-semibold text-tactical-primary">Alta</span>
-                <TrendingUp className="w-5 h-5 text-tactical-primary" />
+                <span className="font-headline-md text-[var(--color-primary)]">Alta</span>
+                <span
+                  className="material-symbols-outlined text-[var(--color-primary)]"
+                  style={{ fontVariationSettings: "'FILL' 1" }}
+                >
+                  stacked_line_chart
+                </span>
               </div>
-              <div className="space-y-2 border-t border-white/10 pt-3">
+              <div className="flex flex-col gap-2 border-t border-[#ffffff14] pt-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-xs text-gray-400">Mapa de Densidad</span>
-                  <div className="flex space-x-1">
-                    <div className="w-2 h-2 rounded-full bg-tactical-primary"></div>
-                    <div className="w-2 h-2 rounded-full bg-tactical-primary/60"></div>
-                    <div className="w-2 h-2 rounded-full bg-tactical-primary/30"></div>
+                  <span className="font-label-sm text-[var(--color-text-secondary)]">Mapa de Densidad</span>
+                  <div className="flex gap-1">
+                    <div className="w-2 h-2 rounded-full bg-[var(--color-primary)]"></div>
+                    <div className="w-2 h-2 rounded-full bg-[var(--color-primary)]/60"></div>
+                    <div className="w-2 h-2 rounded-full bg-[var(--color-primary)]/30"></div>
                   </div>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-xs text-gray-400">Canales de Progresión</span>
-                  <span className="text-sm font-bold text-tactical-primary">74%</span>
+                  <span className="font-label-sm text-[var(--color-text-secondary)]">Canales de Progresión</span>
+                  <span className="font-stats-md text-[var(--color-primary)] font-bold">74%</span>
                 </div>
-                <div className="h-1 w-full bg-gray-700 rounded-full overflow-hidden">
-                  <div className="h-full bg-tactical-primary w-[74%] rounded-full" style={{boxShadow: '0 0 8px rgba(77, 142, 255, 0.5)'}}></div>
+                <div className="h-1 w-full bg-[var(--color-surface-container)] rounded-full overflow-hidden">
+                  <div className="h-full bg-[var(--color-primary)] w-[74%] rounded-full shadow-[0_0_8px_rgba(77,142,255,0.5)]"></div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Tactical Pitch */}
-          <div className="flex items-center justify-center min-h-[600px] p-8">
-            <div className="relative w-full max-w-4xl aspect-[16/10] bg-gradient-to-br from-green-800/20 to-green-900/30 rounded-xl border border-white/10 overflow-hidden">
-              {/* Pitch Grid */}
-              <div className="absolute inset-0 opacity-20">
-                <div className="grid grid-cols-8 grid-rows-6 h-full">
-                  {Array.from({ length: 48 }).map((_, i) => (
-                    <div key={i} className="border border-white/5"></div>
-                  ))}
-                </div>
-              </div>
-              
-              {/* Pitch Lines */}
-              <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 65">
-                <rect fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="0.5" width="100" height="65" />
-                <line x1="50" y1="0" x2="50" y2="65" stroke="rgba(255,255,255,0.15)" strokeWidth="0.5" />
-                <circle cx="50" cy="32.5" r="9.15" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="0.5" />
-                <circle cx="50" cy="32.5" r="0.5" fill="rgba(255,255,255,0.3)" />
-                <rect x="0" y="13.84" width="16.5" height="37.32" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="0.5" />
-                <rect x="83.5" y="13.84" width="16.5" height="37.32" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="0.5" />
-                <rect x="0" y="24.84" width="5.5" height="15.32" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="0.5" />
-                <rect x="94.5" y="24.84" width="5.5" height="15.32" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="0.5" />
-              </svg>
-              
-              {/* Pass Lines */}
-              <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 65">
-                <line x1="20" y1="30" x2="50" y2="70" stroke="rgba(78,222,163,0.6)" strokeWidth="0.3" strokeDasharray="2 2" />
-                <line x1="50" y1="70" x2="70" y2="30" stroke="rgba(245,158,11,0.4)" strokeWidth="0.2" />
-                <line x1="20" y1="30" x2="30" y2="50" stroke="rgba(78,222,163,0.3)" strokeWidth="0.2" strokeDasharray="1 1" />
-              </svg>
-              
-              {/* Players */}
-              {players.map((player) => (
-                <div
-                  key={player.id}
-                  className={`tactical-node ${player.team === 'def' ? 'node-def' : 'node-att'}`}
-                  style={{
-                    left: `${player.x}%`,
-                    top: `${player.y}%`,
-                    transform: 'translate(-50%, -50%)'
-                  }}
-                  onClick={() => handlePlayerClick(player)}
-                >
-                  {player.name}
-                </div>
-              ))}
-              
-              {/* Ball */}
-              <div 
-                className="absolute w-3 h-3 bg-white rounded-full z-30"
-                style={{
-                  left: '68%',
-                  top: '56%',
-                  transform: 'translate(-50%, -50%)',
-                  boxShadow: '0 0 10px rgba(255,255,255,0.8)'
-                }}
-              ></div>
-              
-              {/* Heatmap Overlay */}
-              {showHeatmap && (
-                <div className="absolute inset-0 opacity-30">
-                  <div className="absolute top-1/4 left-1/4 w-1/3 h-1/3 bg-red-500/20 rounded-full blur-xl"></div>
-                  <div className="absolute top-1/2 left-1/2 w-1/4 h-1/4 bg-blue-500/20 rounded-full blur-xl"></div>
-                  <div className="absolute bottom-1/4 right-1/4 w-1/5 h-1/5 bg-emerald-500/20 rounded-full blur-xl"></div>
-                </div>
-              )}
-              
-              {/* Space Analysis Overlay */}
+          {/* Pitch Container */}
+          <div className="relative w-[800px] h-[500px] max-w-[95%] transform rotate-x-12 scale-95 md:scale-100 transition-transform duration-500">
+            {/* SVG Pitch Lines */}
+            <svg className="w-full h-full absolute inset-0 pointer-events-none" viewBox="0 0 100 65">
+              <rect className="pitch-lines" height="65" width="100" x="0" y="0" />
+              <line className="pitch-lines" x1="50" x2="50" y1="0" y2="65" />
+              <circle className="pitch-lines" cx="50" cy="32.5" r="9.15" />
+              <circle cx="50" cy="32.5" fill="rgba(255,255,255,0.3)" r="0.5" />
+              {/* Penalty Areas */}
+              <rect className="pitch-lines" height="37.32" width="16.5" x="0" y="13.84" />
+              <rect className="pitch-lines" height="37.32" width="16.5" x="83.5" y="13.84" />
+              {/* Goal Areas */}
+              <rect className="pitch-lines" height="15.32" width="5.5" x="0" y="24.84" />
+              <rect className="pitch-lines" height="15.32" width="5.5" x="94.5" y="24.84" />
+            </svg>
+
+            {/* Pass Lines (Overlay) */}
+            <svg className="w-full h-full absolute inset-0 pointer-events-none z-10" viewBox="0 0 800 500">
+              <defs>
+                <linearGradient id="pass-grad" x1="0%" x2="100%" y1="0%" y2="100%">
+                  <stop offset="0%" stopColor="#4edea3" stopOpacity="0.8" />
+                  <stop offset="100%" stopColor="#4edea3" stopOpacity="0.1" />
+                </linearGradient>
+              </defs>
+              <line className="animate-[dash_1s_linear_infinite]" stroke="url(#pass-grad)" strokeDasharray="4 4" strokeWidth="2" x1="240" x2="400" y1="200" y2="350" />
+              <line stroke="#f59e0b" strokeOpacity="0.6" strokeWidth="1.5" x1="400" x2="550" y1="350" y2="280" />
+              <line opacity="0.4" stroke="#4edea3" strokeDasharray="2 2" strokeWidth="1" x1="160" x2="240" y1="150" y2="150" />
+              <line opacity="0.4" stroke="#ef4444" strokeDasharray="2 2" strokeWidth="1" x1="240" x2="400" y1="350" y2="200" />
+              <line opacity="0.4" stroke="#f59e0b" strokeDasharray="2 2" strokeWidth="1" x1="520" x2="560" y1="275" y2="150" />
+            </svg>
+
+            {/* Voronoi/Zones Mock (CSS based) */}
+            <div className="absolute inset-0 pointer-events-none opacity-20 z-0 flex">
+              <div className="w-1/3 h-full bg-[var(--color-threat-red)] blur-3xl rounded-full translate-x-1/4"></div>
+              <div className="w-1/3 h-full bg-[var(--color-primary)] blur-3xl rounded-full translate-x-3/4"></div>
               {showSpaceAnalysis && (
-                <div className="absolute inset-0 opacity-40">
-                  <div className="grid grid-cols-6 grid-rows-4 h-full">
-                    {Array.from({ length: 24 }).map((_, i) => (
-                      <div 
-                        key={i} 
-                        className={`border border-tactical-primary/20 ${
-                          i % 3 === 0 ? 'bg-tactical-primary/10' : 
-                          i % 3 === 1 ? 'bg-tactical-primary/5' : ''
-                        }`}
-                      ></div>
-                    ))}
-                  </div>
+                <div className="absolute inset-0 grid grid-cols-6 grid-rows-4 gap-px opacity-30">
+                  {[...Array(24)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="border border-[var(--color-accent-blue-glow)]/10"
+                      style={{
+                        backgroundColor: `rgba(59, 130, 246, ${[0.2, 0.4, 0.1, 0.2, 0.6, 0.3, 0.1, 0.2, 0.5, 0.1, 0.2, 0.4, 0.3, 0.1, 0.2, 0.6, 0.1, 0.2, 0.4, 0.1, 0.2, 0.5, 0.1, 0.3][i]} / 1)`,
+                      }}
+                    ></div>
+                  ))}
                 </div>
               )}
             </div>
+
+            {/* Defensive Nodes (Green/Emerald) */}
+            {players.filter((p) => p.team === 'def').map((player) => (
+              <div
+                key={player.id}
+                className="tactical-node node-def z-20"
+                style={{ left: `${player.x}%`, top: `${player.y}%` }}
+              >
+                {player.name}
+              </div>
+            ))}
+
+            {/* Attacking Nodes (Red) */}
+            {players.filter((p) => p.team === 'att').map((player) => (
+              <div
+                key={player.id}
+                className="tactical-node node-att z-20"
+                style={{ left: `${player.x}%`, top: `${player.y}%` }}
+              >
+                {player.name}
+              </div>
+            ))}
+
+            {/* Ball */}
+            <div
+              className="absolute w-4 h-4 bg-white rounded-full z-30 shadow-[0_0_10px_rgba(255,255,255,0.8)]"
+              style={{ left: '68%', top: '56%' }}
+            ></div>
+
+            {/* Heatmap overlay */}
+            {showHeatmap && (
+              <div className="absolute inset-0 pointer-events-none opacity-20 z-0 flex">
+                <div className="w-1/3 h-full bg-[var(--color-threat-red)] blur-3xl rounded-full translate-x-1/4"></div>
+                <div className="w-1/3 h-full bg-[var(--color-primary)] blur-3xl rounded-full translate-x-3/4"></div>
+              </div>
+            )}
           </div>
         </main>
       </div>
 
-      {/* Timeline Footer */}
-      <footer className="fixed bottom-0 left-0 right-0 z-50 bg-tactical-glass backdrop-blur-xl border-t border-white/10 px-6 py-4">
-        <div className="flex items-center space-x-4 mb-4">
-          <span className="text-sm font-mono text-gray-400 w-12 text-right">{currentTime}</span>
-          <div 
-            className="flex-1 relative h-6 flex items-center cursor-pointer"
+      {/* ===== BottomNavBar (Timeline & Playback) ===== */}
+      <footer className="fixed bottom-0 left-0 md:left-64 right-0 z-50 flex flex-col justify-center bg-[#111827b8] backdrop-blur-xl border-t border-[#ffffff14] px-[24px] py-4 rounded-t-xl">
+        {/* Timeline Slider */}
+        <div className="w-full flex items-center gap-[8px] mb-4">
+          <span className="font-stats-md text-[var(--color-text-secondary)] w-12 text-right">{currentTime}</span>
+          <div
+            className="flex-1 relative h-6 flex items-center group cursor-pointer"
             onClick={handleTimelineClick}
           >
-            <div className="absolute w-full h-1 bg-gray-700 rounded-full"></div>
-            <div 
-              className="absolute h-1 bg-tactical-primary rounded-full"
-              style={{ width: `${timelineProgress}%`, boxShadow: '0 0 8px rgba(77, 142, 255, 0.5)' }}
+            <div className="absolute w-full h-1 bg-[var(--color-surface-container)] rounded-full"></div>
+            <div
+              className="absolute h-1 bg-[var(--color-primary)] rounded-full shadow-[0_0_8px_rgba(77,142,255,0.5)]"
+              style={{ width: `${timelineProgress}%` }}
             ></div>
-            <div 
-              className="absolute w-2 h-4 bg-tactical-tertiary rounded-sm -mt-1"
-              style={{ left: '20%' }}
-            ></div>
-            <div 
-              className="absolute w-2 h-4 bg-tactical-warning rounded-sm -mt-1 shadow-lg z-10"
-              style={{ left: `${timelineProgress}%` }}
-            ></div>
-            <div 
-              className="absolute w-4 h-4 bg-white rounded-full -ml-2 shadow-lg z-20"
+            {/* Keyframes */}
+            <div className="absolute w-2 h-4 bg-[var(--color-tertiary)] rounded-sm left-[20%] -mt-1 group-hover:scale-110 transition-transform"></div>
+            <div className="absolute w-2 h-4 bg-[var(--color-warning-amber)] rounded-sm left-[45%] -mt-1 shadow-[0_0_5px_rgba(245,158,11,0.8)] scale-125 z-10"></div>
+            <div className="absolute w-2 h-4 bg-[var(--color-tertiary)] rounded-sm left-[75%] -mt-1 group-hover:scale-110 transition-transform"></div>
+            {/* Playhead */}
+            <div
+              className="absolute w-4 h-4 bg-white rounded-full -ml-2 shadow-lg z-20 transition-transform scale-100 group-hover:scale-125 border-2 border-[var(--color-primary)]"
               style={{ left: `${timelineProgress}%` }}
             ></div>
           </div>
-          <span className="text-sm font-mono text-gray-400 w-12">{totalTime}</span>
+          <span className="font-stats-md text-[var(--color-text-secondary)] w-12">00:30</span>
         </div>
-        
-        <div className="flex justify-between items-center">
-          <div className="flex space-x-4">
-            <button className="flex flex-col items-center justify-center text-gray-400 hover:text-white p-2 rounded-xl transition-colors hover:bg-white/10">
-              <FastForward className="w-6 h-6 rotate-180" />
-              <span className="text-xs mt-1">Rewind</span>
+
+        {/* Controls */}
+        <div className="flex justify-between items-center w-full">
+          <div className="flex gap-4">
+            <button className="flex flex-col items-center justify-center text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-bright)]/20 p-2 rounded-xl transition-all spring-physics active:scale-95">
+              <span className="material-symbols-outlined text-[24px]">settings_backup_restore</span>
+              <span className="font-label-sm mt-1">Rewind</span>
             </button>
-            <button 
+            <button
               onClick={() => setIsPlaying(!isPlaying)}
-              className="flex flex-col items-center justify-center bg-tactical-tertiary/20 text-tactical-tertiary rounded-xl p-2 px-4 shadow-lg border border-tactical-tertiary/30 transition-all hover:bg-tactical-tertiary/30"
+              className="flex flex-col items-center justify-center bg-[var(--color-tertiary-container)]/20 text-[var(--color-tertiary)] rounded-xl p-2 px-4 shadow-[0_0_15px_rgba(78,222,163,0.15)] border border-[var(--color-tertiary)]/30 transition-all spring-physics hover:bg-[var(--color-tertiary-container)]/30 active:scale-95"
             >
-              {isPlaying ? (
-                <Pause className="w-7 h-7" />
-              ) : (
-                <Play className="w-7 h-7" />
-              )}
-              <span className="text-xs mt-1 font-semibold">{isPlaying ? 'Pause' : 'Play'}</span>
+              <span
+                className="material-symbols-outlined text-[28px]"
+                style={{ fontVariationSettings: "'FILL' 1" }}
+              >
+                {isPlaying ? 'pause' : 'play_arrow'}
+              </span>
+              <span className="font-label-sm mt-1 font-bold">{isPlaying ? 'Pause' : 'Play'}</span>
             </button>
-            <button className="flex flex-col items-center justify-center text-gray-400 hover:text-white p-2 rounded-xl transition-colors hover:bg-white/10">
-              <FastForward className="w-6 h-6" />
-              <span className="text-xs mt-1">Play</span>
+            <button className="flex flex-col items-center justify-center text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-bright)]/20 p-2 rounded-xl transition-all spring-physics active:scale-95">
+              <span className="material-symbols-outlined text-[24px]">fast_forward</span>
+              <span className="font-label-sm mt-1">Play</span>
             </button>
           </div>
-          
-          <button className="flex items-center space-x-2 px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white transition-colors">
-            <Save className="w-5 h-5" />
-            <span className="text-sm font-medium">Save Play</span>
+          <button className="flex items-center gap-2 px-4 py-2 bg-[var(--color-surface-variant)]/50 hover:bg-[var(--color-surface-variant)] border border-[#ffffff14] rounded-lg text-[var(--color-text-primary)] transition-all spring-physics active:scale-95">
+            <span className="material-symbols-outlined text-[20px]">save</span>
+            <span className="font-label-sm">Save Play</span>
           </button>
         </div>
       </footer>
+
+      {/* Dash animation keyframes */}
+      <style>{`
+        @keyframes dash {
+          to { stroke-dashoffset: -8; }
+        }
+      `}</style>
     </div>
   );
 };

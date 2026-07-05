@@ -2,62 +2,259 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ===== Design System: TacticalOS (Stitch Exact) ===== */
+
 @layer base {
+  :root {
+    /* Foundational */
+    --color-canvas: #09090b;
+    --color-background: #131315;
+    --color-surface: #18181b;
+    --color-surface-dim: #131315;
+    --color-surface-bright: #39393b;
+    --color-surface-container-lowest: #0e0e10;
+    --color-surface-container-low: #1c1b1d;
+    --color-surface-container: #201f22;
+    --color-surface-container-high: #2a2a2c;
+    --color-surface-container-highest: #353437;
+    --color-surface-variant: #353437;
+    --color-surface-glass: #111827b8;
+
+    /* Borders */
+    --color-border-technical: #27272a;
+    --color-border-glass: #ffffff14;
+
+    /* Text */
+    --color-text-primary: #fafafa;
+    --color-text-secondary: #94a3b8;
+    --color-text-muted: #64748b;
+    --color-on-surface: #e5e1e4;
+    --color-on-surface-variant: #c2c6d6;
+    --color-inverse-surface: #e5e1e4;
+    --color-inverse-on-surface: #313032;
+
+    /* Primary (Blue - Opportunity) */
+    --color-primary: #adc6ff;
+    --color-on-primary: #002e6a;
+    --color-primary-container: #4d8eff;
+    --color-on-primary-container: #00285d;
+    --color-inverse-primary: #005ac2;
+    --color-primary-fixed: #d8e2ff;
+    --color-primary-fixed-dim: #adc6ff;
+    --color-on-primary-fixed: #001a42;
+    --color-on-primary-fixed-variant: #004395;
+    --color-accent-blue-glow: #3b82f666;
+
+    /* Secondary */
+    --color-secondary: #c8c5ca;
+    --color-on-secondary: #303033;
+    --color-secondary-container: #47464a;
+    --color-on-secondary-container: #b6b4b8;
+    --color-secondary-fixed: #e4e1e6;
+    --color-secondary-fixed-dim: #c8c5ca;
+    --color-on-secondary-fixed: #1b1b1e;
+    --color-on-secondary-fixed-variant: #47464a;
+
+    /* Tertiary (Emerald - Control) */
+    --color-tertiary: #4edea3;
+    --color-on-tertiary: #003824;
+    --color-tertiary-container: #00a572;
+    --color-on-tertiary-container: #00311f;
+    --color-tertiary-fixed: #6ffbbe;
+    --color-tertiary-fixed-dim: #4edea3;
+    --color-on-tertiary-fixed: #002113;
+    --color-on-tertiary-fixed-variant: #005236;
+
+    /* Semantic */
+    --color-threat-red: #ef4444;
+    --color-warning-amber: #f59e0b;
+    --color-error: #ffb4ab;
+    --color-on-error: #690005;
+    --color-error-container: #93000a;
+    --color-on-error-container: #ffdad6;
+
+    /* Outlines */
+    --color-outline: #8c909f;
+    --color-outline-variant: #424754;
+    --color-surface-tint: #adc6ff;
+    --color-on-background: #e5e1e4;
+  }
+
   body {
-    @apply bg-[#0a0a0f] text-white font-['Inter',sans-serif];
-    overflow-x: hidden;
+    @apply antialiased;
+    background-color: var(--color-canvas);
+    color: var(--color-text-primary);
+    overflow: hidden;
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* ===== Typography from Stitch ===== */
+  .font-headline-lg {
+    font-family: 'Geist', sans-serif;
+    font-size: 32px;
+    line-height: 40px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .font-headline-md {
+    font-family: 'Geist', sans-serif;
+    font-size: 24px;
+    line-height: 32px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .font-body-lg {
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 400;
+  }
+  .font-body-md {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 21px;
+    font-weight: 400;
+  }
+  .font-stats-lg {
+    font-family: 'Geist Mono', monospace;
+    font-size: 18px;
+    line-height: 24px;
+    font-weight: 600;
+  }
+  .font-stats-md {
+    font-family: 'Geist Mono', monospace;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 500;
+  }
+  .font-label-sm {
+    font-family: 'Geist', sans-serif;
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 600;
   }
 }
+
+/* ===== Custom Components ===== */
 
 @layer components {
-  .glass-panel {
-    @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl;
+  /* Spring physics for all transitions */
+  .spring-physics {
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
-  
-  .glow-primary {
-    box-shadow: 0 0 20px rgba(77, 142, 255, 0.3);
+
+  /* Glow effect for active elements */
+  .glow-active {
+    box-shadow: 0 0 20px 0 rgba(59, 130, 246, 0.4);
   }
-  
-  .glow-tertiary {
-    box-shadow: 0 0 20px rgba(78, 222, 163, 0.3);
+
+  /* Pitch field lines with SVG glow */
+  .pitch-lines {
+    stroke: rgba(255, 255, 255, 0.15);
+    stroke-width: 1px;
+    fill: none;
+    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.2));
   }
-  
+
+  /* Pitch grid background */
+  .pitch-grid {
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  /* Tactical Node (player token) */
   .tactical-node {
-    @apply w-8 h-8 rounded-full border-2 flex items-center justify-center text-sm font-bold cursor-grab active:cursor-grabbing transition-all duration-200 hover:scale-110;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Geist Mono', monospace;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: grab;
+    position: absolute;
+    background: var(--color-surface);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    transition: border-color 0.2s, box-shadow 0.2s;
   }
-  
+  .tactical-node:hover {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+  }
   .node-def {
-    @apply border-emerald-400 text-emerald-400 bg-emerald-400/10;
+    border-color: var(--color-tertiary);
+    color: var(--color-tertiary);
   }
-  
   .node-att {
-    @apply border-red-400 text-red-400 bg-red-400/10;
+    border-color: var(--color-threat-red);
+    color: var(--color-threat-red);
   }
-  
-  .btn-primary {
-    @apply bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium py-2 px-4 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 glow-primary;
-  }
-  
-  .btn-secondary {
-    @apply bg-white/10 text-white font-medium py-2 px-4 rounded-lg hover:bg-white/20 transition-all duration-200 border border-white/20;
-  }
-}
 
-@layer utilities {
-  .animate-pulse-slow {
-    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  /* Custom range slider (from stitch) */
+  input[type='range'] {
+    -webkit-appearance: none;
+    width: 100%;
+    background: transparent;
   }
-  
-  .animate-glow {
-    animation: glow 2s ease-in-out infinite alternate;
+  input[type='range']::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    cursor: pointer;
+    margin-top: -6px;
+    box-shadow: 0 0 10px rgba(77, 142, 255, 0.5);
   }
-}
+  input[type='range']::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 4px;
+    cursor: pointer;
+    background: var(--color-border-technical);
+    border-radius: 2px;
+  }
 
-@keyframes glow {
-  from {
-    box-shadow: 0 0 5px rgba(77, 142, 255, 0.3);
+  /* Toggle switch */
+  .toggle-checkbox:checked {
+    right: 0;
+    border-color: var(--color-primary-container);
   }
-  to {
-    box-shadow: 0 0 20px rgba(77, 142, 255, 0.6);
+  .toggle-checkbox:checked + .toggle-label {
+    background-color: var(--color-primary-container);
+  }
+
+  /* Glass panel (same as stitch KPI cards) */
+  .glass-panel {
+    background-color: var(--color-surface-glass);
+    backdrop-filter: blur(24px);
+    border: 1px solid var(--color-border-glass);
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Selection color */
+  ::selection {
+    background-color: var(--color-primary-container);
+    color: var(--color-on-primary-container);
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
   }
 }
