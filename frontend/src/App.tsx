@@ -1,9 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { 
-  Play, Pause, FastForward, FastForwardOff, Save, 
-  Settings, Bell, Search, ChevronDown, TrendingUp,
-  Activity, Map, Target, Shield, Zap, Layers,
-  BarChart3, PieChart, Eye, EyeOff
+  Play, Pause, FastForward, Save, 
+  Settings, Bell, TrendingUp, Zap
 } from 'lucide-react';
 
 interface Player {
@@ -408,7 +406,7 @@ const TacticalOS: React.FC = () => {
         <div className="flex justify-between items-center">
           <div className="flex space-x-4">
             <button className="flex flex-col items-center justify-center text-gray-400 hover:text-white p-2 rounded-xl transition-colors hover:bg-white/10">
-              <FastForwardOff className="w-6 h-6" />
+              <FastForward className="w-6 h-6 rotate-180" />
               <span className="text-xs mt-1">Rewind</span>
             </button>
             <button 
